@@ -9,5 +9,6 @@ namespace EventBooking.Repositories.Interfaces
         Task<List<Event>> GetEvents(GetEventsRequest request);
         Task<ApiResponse<bool>> UpsertEvent(UpsertEventRequest e);
         Task<ApiResponse<bool>> RegisterForEvent(RegisterEventRequest request);
+        Task<ApiResponse<bool>> DeleteEvent(DeleteEventRequest request);
     }
 }

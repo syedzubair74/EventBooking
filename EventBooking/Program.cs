@@ -25,7 +25,11 @@ public class Program
 
         });
 
-        builder.Services.AddDbContext<EventBookingDbContext>(db => db.UseSqlServer(builder.Configuration.GetConnectionString("EventBookingConnectionString")), ServiceLifetime.Singleton);
+        builder.Services.AddDbContext<EventBookingDbContext>(
+            options => options.UseSqlServer(builder.Configuration.GetConnectionString("EventBookingConnectionString")),
+            ServiceLifetime.Scoped
+        );
+
 
         //Dependency Injections
         builder.Services.AddTransient<IEventRepository, EventRepository>();

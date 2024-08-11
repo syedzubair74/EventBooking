@@ -46,35 +46,108 @@ namespace EventBooking.Repositories
                     var query = await _dbContext.Event.FirstOrDefaultAsync(x => x.Id == e.Id);
                     if (query != null)
                     {
-                        query.Name = e.Name;
-                        query.Description = e.Description;
-                        query.Location = e.Location;
-                        query.Category = e.Category;
-                        query.NumberOfAttendees = e.NumberOfAttendees;
-                        query.ThumbnailImage = e.ThumbnailImage;
-                        query.MainImage = e.MainImage;
-                        query.EventDate = DateTime.Parse(e.EventDate);
-                        _dbContext.Event.Update(query);
-                    }
-                    else
-                    {
-                        var ev = new Event
+                        if (!string.IsNullOrEmpty(e.Name))
                         {
-                            Name = e.Name,
-                            Description = e.Description,
-                            Location = e.Location,
-                            Category = e.Category,
-                            NumberOfAttendees = e.NumberOfAttendees,
-                            ThumbnailImage = e.ThumbnailImage,
-                            MainImage = e.MainImage,
-                            EventDate = DateTime.Parse(e.EventDate)
-                        };
-                        await _dbContext.Event.AddAsync(ev);
+                            query.Name = e.Name;
+                        }
+
+                        if (!string.IsNullOrEmpty(e.Description))
+                        {
+                            query.Description = e.Description;
+                        }
+
+                        if (!string.IsNullOrEmpty(e.Location))
+                        {
+                            query.Location = e.Location;
+                        }
+
+                        if (!string.IsNullOrEmpty(e.Category))
+                        {
+                            query.Category = e.Category;
+                        }
+
+                        if (e.NumberOfAttendees.HasValue)
+                        {
+                            query.NumberOfAttendees = e.NumberOfAttendees.Value;
+                        }
+
+                        if (!string.IsNullOrEmpty(e.ThumbnailImage))
+                        {
+                            query.ThumbnailImage = e.ThumbnailImage;
+                        }
+
+                        if (!string.IsNullOrEmpty(e.MainImage))
+                        {
+                            query.MainImage = e.MainImage;
+                        }
+
+                        if (!string.IsNullOrEmpty(e.EventDate))
+                        {
+                            query.EventDate = DateTime.Parse(e.EventDate);
+                        }
+                        if (!string.IsNullOrEmpty(e.MaxAllowed))
+                        {
+                            query.MaxAllowed = int.Parse(e.MaxAllowed);
+                        }
+
+                        _dbContext.Event.Update(query);
+
                     }
-                    await _dbContext.SaveChangesAsync();
-                    response.IsRequestSuccesfull = true;
-                    response.SuccessResponse = true;
                 }
+                else
+                {
+                    var ev = new Event();
+
+                    if (!string.IsNullOrEmpty(e.Name))
+                    {
+                        ev.Name = e.Name;
+                    }
+
+                    if (!string.IsNullOrEmpty(e.Description))
+                    {
+                        ev.Description = e.Description;
+                    }
+
+                    if (!string.IsNullOrEmpty(e.Location))
+                    {
+                        ev.Location = e.Location;
+                    }
+
+                    if (!string.IsNullOrEmpty(e.Category))
+                    {
+                        ev.Category = e.Category;
+                    }
+
+                    if (e.NumberOfAttendees.HasValue)
+                    {
+                        ev.NumberOfAttendees = e.NumberOfAttendees.Value;
+                    }
+
+                    if (!string.IsNullOrEmpty(e.ThumbnailImage))
+                    {
+                        ev.ThumbnailImage = e.ThumbnailImage;
+                    }
+
+                    if (!string.IsNullOrEmpty(e.MainImage))
+                    {
+                        ev.MainImage = e.MainImage;
+                    }
+
+                    if (!string.IsNullOrEmpty(e.EventDate))
+                    {
+                        ev.EventDate = DateTime.Parse(e.EventDate);
+                    }
+                    if (!string.IsNullOrEmpty(e.MaxAllowed))
+                    {
+                        ev.MaxAllowed = int.Parse(e.MaxAllowed);
+                    }
+
+                    await _dbContext.Event.AddAsync(ev);
+                }
+                await _dbContext.SaveChangesAsync();
+                response.IsRequestSuccesfull = true;
+                response.SuccessResponse = true;
+
             }
             catch (Exception ex)
             {
@@ -89,8 +162,9 @@ namespace EventBooking.Repositories
             try
             {
                 var evnt = await _dbContext.Event.FirstOrDefaultAsync(x => x.Id == request.EventId);
-                if (evnt != null) {
-                    if(evnt.NumberOfAttendees == evnt.MaxAllowed)
+                if (evnt != null)
+                {
+                    if (evnt.NumberOfAttendees == evnt.MaxAllowed)
                     {
                         throw new Exception("Attendance full");
                     }
@@ -115,7 +189,36 @@ namespace EventBooking.Repositories
                 {
                     throw new Exception("Event does not exist!");
                 }
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
+            {
+                response.IsRequestSuccesfull = false;
+                response.Error = ex.Message;
+            }
+            return response;
+        }
+        public async Task<ApiResponse<bool>> DeleteEvent(DeleteEventRequest request)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                if (request.Id == null)
+                {
+                    throw new ArgumentException(nameof(request.Id));
+                }
+
+                var evnt = await _dbContext.Event.FirstOrDefaultAsync(x => x.Id == request.Id);
+                if (evnt == null)
+                {
+                    throw new Exception("Data not found");
+                }
+
+                _dbContext.Event.Remove(evnt);
+                await _dbContext.SaveChangesAsync();
+                response.IsRequestSuccesfull = true;
+                response.SuccessResponse = true;
+            }
+            catch (Exception ex)
             {
                 response.IsRequestSuccesfull = false;
                 response.Error = ex.Message;

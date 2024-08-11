@@ -12,5 +12,6 @@ namespace EventBooking.DTO.Requests
         public string? MainImage { get; set; }
         public string? Category { get; set; }
         public string? EventDate { get; set; }
+        public string? MaxAllowed { get; set; }
     }
 }

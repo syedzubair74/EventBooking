@@ -37,5 +37,12 @@ namespace EventBooking.Controllers
 
             return Ok(response);
         }
+        [HttpPost("Delete")]
+        public async Task<IActionResult> DeleteEvent(DeleteEventRequest request)
+        {
+            var response = await _eventRepository.DeleteEvent(request);
+
+            return Ok(response);
+        }
     }
 }
